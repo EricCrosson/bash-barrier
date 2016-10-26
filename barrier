@@ -2,7 +2,13 @@
 # Written by Eric Crosson
 # 2016-10-26
 #
-# TODO: document
+# Act as a synchronization barrier in a shell context.
+#
+# Arguments:
+# an integer (no args is equivalent to passing `1`)
+#     - describes number of broadcasts to wait for
+# a list of hosts (may be length 1)
+#     - hosts to notify that barrier has been reached
 
 # set -e
 # set -x
