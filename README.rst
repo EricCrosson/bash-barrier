@@ -45,6 +45,14 @@ will wait for a different shell to execute::
 and any barriers listening on the default port (``64926``) will not be
 affected.
 
+Limitations
+-----------
+
+This is implemented in-shell for-shell.  This is not a performant
+package.  In use cases where multiple broadcasts may be received in a
+narrow time window, some may be dropped by the listener.  The casual
+user will be fine.
+
 License
 -------
 
