@@ -29,6 +29,22 @@ To notify waiting shells that you have reached a barrier, invoke
     barrier localhost
     barrier host1 host2 host3
 
+Advanced
+~~~~~~~~
+
+To use multiple, independent barriers that should not notify each
+other, customize the ``PORT`` environment variable in the executing
+shell.  For example::
+
+    PORT=5656 barrier  # choose an unused port at random
+
+will wait for a different shell to execute::
+
+    PORT=5656 barrier localhost
+
+and any barriers listening on the default port (``64926``) will not be
+affected.
+
 License
 -------
 
