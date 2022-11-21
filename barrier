@@ -67,7 +67,7 @@ listen() {
 
 broadcast() {
   for host in "$@"; do
-    echo | nc "${host}" "${port}"
+    echo | nc -N "${host}" "${port}"
   done
 }
 
