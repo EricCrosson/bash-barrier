@@ -1,64 +1,92 @@
 #!/usr/bin/env bash
-# Written by Eric Crosson
-# 2016-10-26
 #
-# Act as a synchronization barrier in a shell context.
+# A synchronization barrier for your shell.
 #
-# Arguments:
-# an integer (no args is equivalent to passing `1`)
-#     - describes number of broadcasts to wait for
-# a list of hosts (may be length 1)
-#     - hosts to notify that barrier has been reached
+# Usage:
+#   barrier [<count>|<hosts>...]
+#
+# Options:
+#   count    The number of notifications to wait for [default: 1]
+#   hosts    Hostname to notify that the barrier has been reached
+#
+# @example
+# Wait for a single notification before proceeding:
+#
+# ```
+# barrier
+# ```
+#
+# @example
+# Wait for 3 notifications before proceeding:
+#
+# ```
+# barrier 3
+# ```
+#
+# @example
+# Notify localhost without blocking:
+#
+# ```
+# barrier localhost
+# ```
+#
+# @example
+# Notify host1 and host2 without blocking:
+#
+# ```
+# barrier host1 host2
+# ```
 
-# set -e
-# set -x
+set -o errexit
+set -o nounset
+set -o pipefail
 
-declare -r default_port=64926
-declare -r port=${PORT:-${default_port}}
+readonly default_port=64926
+readonly port="${PORT:-${default_port}}"
 
 printHelp() {
-    cat <<EOF
+    cat <<-EOF
 
-    Usage: $0 <count>|hosts
+Usage:
+  barrier [<count>|<hosts>...]
 
-    where
-      count    (defaults to 0) is the number of broadcasts to listen
-               for before proceeding
-      hosts    is a list of hosts to broadcast to before proceeding
+Options:
+  count    The number of broadcasts to wait for [default: 1]
+  hosts    Hostname to notify that the barrier has been reached
 
 EOF
     exit 1
 }
 
-listenMode() {
-    for i in $(seq 1 $1); do
-        nc -l ${port}
-    done
+listen() {
+  # shellcheck disable=SC2034
+  for i in $(seq 1 "$1"); do
+    nc -l "${port}"
+  done
 }
 
-broadcastMode() {
-    for host in "$@"; do
-        echo | nc ${host} ${port}
-    done
+broadcast() {
+  for host in "$@"; do
+    echo | nc "${host}" "${port}"
+  done
 }
 
 main() {
-    while true; do
-        case "$1" in
-            -h|--help) printHelp ;;
-            --) shift; break ;;
-            *) break ;;
-        esac
-    done
+  while true; do
+    case "${1:-}" in
+      -h|--help) printHelp ;;
+      --) shift; break ;;
+      *) break ;;
+    esac
+  done
 
-    if [[ "$#" -eq 0 ]]; then
-        listenMode 1
-    elif [[ $1 =~ ^-?[0-9]+$ ]]; then
-        listenMode $1
-    else
-        broadcastMode "$@"
-    fi
+  if [[ "$#" -eq 0 ]]; then
+    listen 1
+  elif [[ $1 =~ ^-?[0-9]+$ ]]; then
+    listen "${1:-}"
+  else
+    broadcast "$@"
+  fi
 }
-
 
 main "$@"
