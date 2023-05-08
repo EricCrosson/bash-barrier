@@ -1,5 +1,5 @@
 {
-  description = "barrier dev shell";
+  description = "bash-barrier dev shell";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
